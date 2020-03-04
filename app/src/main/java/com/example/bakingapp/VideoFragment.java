@@ -36,20 +36,19 @@ public class VideoFragment extends Fragment {
     private SimpleExoPlayer mExoPlayer;
     private PlayerView mPlayerView;
     private boolean playWhenReady = true;
-    private int currentWindow;
+    private int currentWindow = 0;
+    private int position;
     private long playbackPosition = 0;
     private Recipe recipe;
     private TextView detailTextView;
-    private String stepDescription;
 
     public VideoFragment() {
 
     }
 
-    VideoFragment(int position, Recipe recipe ,String stepDescription) {
-        this.currentWindow = position;
+    VideoFragment(int position, Recipe recipe ) {
+        this.position = position;
         this.recipe = recipe;
-        this.stepDescription = stepDescription;
     }
 
     @Nullable
@@ -57,14 +56,14 @@ public class VideoFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             recipe = savedInstanceState.getParcelable("recipe");
-            currentWindow = savedInstanceState.getInt("position");
+            currentWindow = savedInstanceState.getInt("currentWindow");
             playbackPosition = savedInstanceState.getLong("playback");
             playWhenReady = savedInstanceState.getBoolean("play");
         }
         View rootView = inflater.inflate(R.layout.video_fragment, container, false);
         mPlayerView = rootView.findViewById(R.id.exoplayer);
         detailTextView = rootView.findViewById(R.id.detail_text_view);
-        detailTextView.setText(stepDescription);
+        detailTextView.setText(recipe.getSteps().get(position).getRecipeDescription());
         initializePlayer();
         return rootView;
     }
@@ -84,8 +83,6 @@ public class VideoFragment extends Fragment {
             mExoPlayer.setPlayWhenReady(playWhenReady);
             mExoPlayer.seekTo(currentWindow, playbackPosition);
             mExoPlayer.addListener(new PlayerEventListener());
-
-
         }
     }
 
@@ -98,11 +95,15 @@ public class VideoFragment extends Fragment {
 
         ConcatenatingMediaSource mediaSource = new ConcatenatingMediaSource();
         for (int i = 0; i < recipe.getSteps().size(); i++) {
+
             String video = recipe.getSteps().get(i).getVideoURL();
             if (!video.equals("")) {
                 Uri uri1 = Uri.parse(video).buildUpon()
                         .build();
                 mediaSource.addMediaSource(mediaSourceFactory.createMediaSource(uri1));
+                if (i<position){
+                    currentWindow++;
+                }
             }
         }
 
@@ -204,7 +205,7 @@ public class VideoFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle currentState) {
         currentState.putParcelable("recipe", recipe);
-        currentState.putInt("position", currentWindow);
+        currentState.putInt("currentWindow", currentWindow);
         currentState.putBoolean("play", playWhenReady);
         currentState.putLong("playback", playbackPosition);
     }

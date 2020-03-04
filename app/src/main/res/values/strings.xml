@@ -2,4 +2,6 @@
     <string name="app_name">BakingApp</string>
     <string name="title_activity_detail">DetailActivity</string>
     <string name="steps">Steps</string>
+    <string name="appwidget_text">app</string>
+
 </resources>

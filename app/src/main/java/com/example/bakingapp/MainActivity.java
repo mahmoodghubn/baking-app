@@ -4,13 +4,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.preference.PreferenceManager;
 
+import android.content.SharedPreferences;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
 import com.example.bakingapp.data.Recipe;
 import com.example.bakingapp.network.JSONInterface;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -26,13 +29,14 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
 
     RecipeAdapter mAdapter;
     RecyclerView recyclerView;
-    public static final String RECIPE_BUNDLE = "recipeBundle";
     public static final String RECIPE = "recipe";
+    Recipe recipe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         recyclerView = findViewById(R.id.ingredient_recycler_view);
         RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
         recyclerView.setLayoutManager(gridLayoutManager);
@@ -65,11 +69,17 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
 
     @Override
     public void onClickRecipe(Recipe recipeData, View view) {
+        recipe = recipeData;
         Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(RECIPE, recipeData);
-        intent.putExtra(RECIPE_BUNDLE, bundle);
+        SharedPreferences sharedPreferences;
+        SharedPreferences.Editor editor;
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(recipe);
+        editor.putString(RECIPE, json);
+        editor.commit();
 
         @SuppressWarnings("unchecked")
         ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(
@@ -81,4 +91,6 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
 
 
     }
+
+
 }

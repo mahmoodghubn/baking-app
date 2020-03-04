@@ -1,15 +1,16 @@
 package com.example.bakingapp;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Parcelable;
 
 import com.example.bakingapp.data.Recipe;
+import com.google.gson.Gson;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.preference.PreferenceManager;
 
 import static com.example.bakingapp.MainActivity.RECIPE;
-import static com.example.bakingapp.MainActivity.RECIPE_BUNDLE;
 
 public class DetailActivity extends AppCompatActivity {
     Recipe recipe;
@@ -20,27 +21,16 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
 
         if (savedInstanceState == null) {
-            getIntentExtras();
+            SharedPreferences sharedPreferences;
+            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString(RECIPE, "");
+            recipe = gson.fromJson(json, Recipe.class);
             DetailFragment detailFragment = new DetailFragment(recipe);
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
                     .add(R.id.detail_fragment_container, detailFragment)
                     .commit();
         }
-
     }
-
-    private void getIntentExtras() {
-        if (getIntent().getExtras() != null) {
-            Bundle ingredientsBundle = getIntent().getExtras().getBundle(RECIPE_BUNDLE);
-            if (ingredientsBundle != null) {
-                Parcelable ingredientsParcelableArray = ingredientsBundle.getParcelable(RECIPE);
-                if (ingredientsParcelableArray != null) {
-                    recipe = (Recipe) ingredientsParcelableArray;
-                }
-            }
-        }
-    }
-
-
 }

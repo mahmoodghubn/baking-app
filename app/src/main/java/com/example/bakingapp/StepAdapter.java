@@ -24,7 +24,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepAdapterVie
     private final StepAdapterOnClickHandler mClickHandler;
 
     public interface StepAdapterOnClickHandler {
-        void onClickStep(Step stepDate, int stepPosition);
+        void onClickStep(Step stepDate,int stepPosition);
     }
 
     StepAdapter(StepAdapterOnClickHandler clickHandler) {
@@ -50,16 +50,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepAdapterVie
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
             Step oneStep = mStepsData.get(adapterPosition);
-            int position = 0;
-            for (Step step : mStepsData) {
-                if (!step.getVideoURL().equals("")) {
-                    if (step.getVideoURL().equals(oneStep.getVideoURL())) {
-                        break;
-                    }
-                    position++;
-                }
-            }
-            mClickHandler.onClickStep(oneStep, position);
+            mClickHandler.onClickStep(oneStep,adapterPosition);
         }
     }
 
